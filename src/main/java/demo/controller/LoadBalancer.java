@@ -26,7 +26,7 @@ public class LoadBalancer {
 
     @GetMapping("/service/hello/{name}")
     public ResponseEntity<String> hello(@PathVariable String name) throws JsonMappingException, JsonProcessingException {
-        if(!isLoadBalancer()){
+        if (!isLoadBalancer()) {
             return null;
         }
         if (hello_workers == null) {
@@ -53,9 +53,10 @@ public class LoadBalancer {
         System.out.println("Sent to " + worker.getHostname());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
     @GetMapping("/service/chat")
     public ResponseEntity<String> chat() {
-        if(!isLoadBalancer()){
+        if (!isLoadBalancer()) {
             return null;
         }
         if (chat_workers == null) {
@@ -79,17 +80,18 @@ public class LoadBalancer {
         System.out.println("Sent to " + worker.getHostname());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
     @PostMapping("/postworkers")
     public ResponseEntity<String> postWorkers(@RequestBody List<Worker> worker) {
-        if(!isLoadBalancer()){
+        if (!isLoadBalancer()) {
             return null;
         }
         hello_workers.clear();
         chat_workers.clear();
         for (Worker w : worker) {
-            if(w.getService().equals("hello")){
+            if (w.getService().equals("hello")) {
                 hello_workers.add(w);
-            } else if(w.getService().equals("chat")){
+            } else if (w.getService().equals("chat")) {
                 chat_workers.add(w);
             }
         }
@@ -97,7 +99,7 @@ public class LoadBalancer {
         return new ResponseEntity<>("Workers updated", HttpStatus.OK);
     }
 
-    public boolean isLoadBalancer(){
+    public boolean isLoadBalancer() {
         return System.getenv().get("APP_TYPE").equals("loadbalancer");
     }
 }
