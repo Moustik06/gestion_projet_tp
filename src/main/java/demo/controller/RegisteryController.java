@@ -61,6 +61,9 @@ public class RegisteryController {
         System.out.println("ICCIIIIII");
         List<Worker> workers = workersRepo.streamAllBy().toList();
         System.out.println(workers);
+        for (Worker worker : workers) {
+            System.out.println(worker.getHostname() + " " + worker.getService());
+        }
 
         checkUnresponsiveWorkers(workers);
 

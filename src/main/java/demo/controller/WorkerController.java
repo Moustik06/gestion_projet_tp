@@ -28,21 +28,23 @@ public class WorkerController {
     private String hostname;
     private Worker self;
 
+    private String service;
+
     @EventListener(ApplicationReadyEvent.class)
     public void afterStartup(){
         String appType = System.getenv().get("APP_TYPE");
         System.out.println("APP_TYPE: " + appType); // Log de débogage pour APP_TYPE
-
         if (appType == null || !appType.equals("worker")) {
             System.out.println("I am " + appType + " and I am not a worker");
             return;
         }
 
         this.hostname = System.getenv().get("HOSTNAME");
+        service = System.getenv().get("SERVICE");
         System.out.println("HOSTNAME: " + this.hostname); // Log de débogage pour HOSTNAME
 
         if (this.hostname != null){
-            this.self = new Worker(hostname);
+            this.self = new Worker(hostname,service);
             RestClient restClient = RestClient.create();
             restClient.post()
                     .uri("http://registery:8081/workers/manifest")
@@ -77,5 +79,10 @@ public class WorkerController {
         }
         String response = "Hello " + name + " I am " + hostname;
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/chat")
+    public ResponseEntity<String> chat() {
+        return new ResponseEntity<>("Hello I am " + hostname + ". Welcome to the chat service", HttpStatus.OK);
     }
 }

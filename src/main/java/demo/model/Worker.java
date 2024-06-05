@@ -8,10 +8,13 @@ public class Worker {
     private String hostname;
     private LocalDateTime lastManifestTime;
 
+    private String service;
+
     public Worker() {
     }
-    public Worker(String hostname) {
+    public Worker(String hostname, String service) {
         this.hostname = hostname;
+        this.service = service;
     }
 
     public String getHostname() {
@@ -27,5 +30,13 @@ public class Worker {
 
     public void setLastManifestTime(LocalDateTime lastManifestTime) {
         this.lastManifestTime = lastManifestTime;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 }
