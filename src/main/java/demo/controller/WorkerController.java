@@ -27,11 +27,11 @@ import java.util.Objects;
 public class WorkerController {
     private String hostname;
     private Worker self;
-
     private String service;
+    private String port;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void afterStartup(){
+    public void afterStartup() {
         String appType = System.getenv().get("APP_TYPE");
         System.out.println("APP_TYPE: " + appType); // Log de débogage pour APP_TYPE
         if (appType == null || !appType.equals("worker")) {
@@ -40,11 +40,13 @@ public class WorkerController {
         }
 
         this.hostname = System.getenv().get("HOSTNAME");
-        service = System.getenv().get("SERVICE");
+        this.service = System.getenv().get("SERVICE");
+        this.port = System.getenv().get("PORT");
+
         System.out.println("HOSTNAME: " + this.hostname); // Log de débogage pour HOSTNAME
 
-        if (this.hostname != null){
-            this.self = new Worker(hostname,service);
+        if (this.hostname != null) {
+            this.self = new Worker(hostname, service, port);
             RestClient restClient = RestClient.create();
             restClient.post()
                     .uri("http://registery:8081/workers/manifest")
@@ -60,7 +62,7 @@ public class WorkerController {
 
     @Scheduled(fixedRate = 60000)
     public void registerWorker() {
-        if(!System.getenv().get("APP_TYPE").equals("worker")){
+        if (!System.getenv().get("APP_TYPE").equals("worker")) {
             return;
         }
         System.out.println("TTTTTTTTTTTEEEEEEEEEEESSSSSSSSTTTTTTTTT");
@@ -70,11 +72,11 @@ public class WorkerController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(this.self).retrieve();
         System.out.println("Worker '" + this.hostname + "' registered.");
-
     }
+
     @PostMapping("/hello")
     public ResponseEntity<String> hello(@RequestBody String name) {
-        if(!System.getenv().get("APP_TYPE").equals("worker")){
+        if (!System.getenv().get("APP_TYPE").equals("worker")) {
             return null;
         }
         String response = "Hello " + name + " I am " + hostname;

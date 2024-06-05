@@ -3,7 +3,6 @@ package demo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import demo.model.Worker;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +17,16 @@ import java.util.Random;
 @CrossOrigin
 @Controller
 public class LoadBalancer {
-    private List<Worker> hello_workers = new ArrayList<>();
+    private final List<Worker> hello_workers = new ArrayList<>();
 
-    private List<Worker> chat_workers = new ArrayList<>();
+    private final List<Worker> chat_workers = new ArrayList<>();
     private int index = 0;
 
 
     @GetMapping("/service/hello/{name}")
     public ResponseEntity<String> hello(@PathVariable String name) throws JsonMappingException, JsonProcessingException {
-        if (!isLoadBalancer()) {
+        if (isNotLoadBalancer()) {
             return null;
-        }
-        if (hello_workers == null) {
-            return new ResponseEntity<>("No workers available", HttpStatus.SERVICE_UNAVAILABLE);
         }
         if (hello_workers.isEmpty()) {
             return new ResponseEntity<>("No workers available", HttpStatus.SERVICE_UNAVAILABLE);
@@ -41,8 +37,6 @@ public class LoadBalancer {
         Worker worker = hello_workers.get(index);
         Random rand = new Random();
         index = rand.nextInt(hello_workers.size());
-
-
         RestClient restClient = RestClient.create();
         String result = restClient.post()
                 .uri("http://" + worker.getHostname() + ":8081/hello")
@@ -56,11 +50,8 @@ public class LoadBalancer {
 
     @GetMapping("/service/chat")
     public ResponseEntity<String> chat() {
-        if (!isLoadBalancer()) {
+        if (isNotLoadBalancer()) {
             return null;
-        }
-        if (chat_workers == null) {
-            return new ResponseEntity<>("No workers available", HttpStatus.SERVICE_UNAVAILABLE);
         }
         if (chat_workers.isEmpty()) {
             return new ResponseEntity<>("No workers available", HttpStatus.SERVICE_UNAVAILABLE);
@@ -71,7 +62,6 @@ public class LoadBalancer {
         Worker worker = chat_workers.get(index);
         Random rand = new Random();
         index = rand.nextInt(chat_workers.size());
-
         RestClient restClient = RestClient.create();
         String result = restClient.get()
                 .uri("http://" + worker.getHostname() + ":8081/chat")
@@ -83,7 +73,7 @@ public class LoadBalancer {
 
     @PostMapping("/postworkers")
     public ResponseEntity<String> postWorkers(@RequestBody List<Worker> worker) {
-        if (!isLoadBalancer()) {
+        if (isNotLoadBalancer()) {
             return null;
         }
         hello_workers.clear();
@@ -99,8 +89,8 @@ public class LoadBalancer {
         return new ResponseEntity<>("Workers updated", HttpStatus.OK);
     }
 
-    public boolean isLoadBalancer() {
-        return System.getenv().get("APP_TYPE").equals("loadbalancer");
+    public boolean isNotLoadBalancer() {
+        return !System.getenv().get("APP_TYPE").equals("loadbalancer");
     }
 }
 

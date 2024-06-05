@@ -9,42 +9,39 @@ services:
       - APP_TYPE=registery
     networks:
       - internal_network
+  server:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: server
+      environment:
+        - APP_TYPE=server
+      ports:
+        - "8081:8081"
+      networks:
+        - internal_network
 
-  worker1:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: worker1
-    environment:
-      - APP_TYPE=worker
-      - HOSTNAME=worker1
-      - SERVICE=hello
-    networks:
-      - internal_network
-
-  worker2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: worker2
-    environment:
-      - APP_TYPE=worker
-      - HOSTNAME=worker2
-      - SERVICE=hello
-    networks:
-      - internal_network
-
-  worker3:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: worker3
-    environment:
-      - APP_TYPE=worker
-      - HOSTNAME=worker3
-      - SERVICE=chat
-    networks:
-      - internal_network
+  node1:
+      build:
+        context: .
+        dockerfile: Dockerfile.noeud
+      container_name: node1
+      privileged: true
+      environment:
+        - APP_TYPE=node
+        - NODE_ID=node1
+      ports:
+        - "2375:2375"
+      networks:
+        - internal_network
+      command: >
+        sh -c "
+          dockerd-entrypoint.sh & 
+          while ! docker info; do
+            sleep 1
+          done;
+          tail -f /dev/null
+        "
 
   loadbalancer:
     build:
@@ -54,12 +51,9 @@ services:
     environment:
       - APP_TYPE=loadbalancer
     ports:
-      - "8001:8081" # Port 3000 pour l'équilibreur de charge
+      - "8001:8081"
     depends_on:
       - registery
-      - worker1
-      - worker2
-      - worker3
     networks:
       - internal_network
 

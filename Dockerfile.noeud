@@ -1,8 +1,9 @@
 # Utiliser l'image officielle Docker-in-Docker
-FROM docker:20.10-dind
+FROM docker:20.10.12-dind
 
 # Exposer le port 2375 pour accéder au démon Docker
 EXPOSE 2375
 
+RUN apk add --no-cache curl
 # Activer les privilèges pour exécuter le démon Docker
-RUN dockerd-entrypoint.sh
+CMD ["dockerd"]

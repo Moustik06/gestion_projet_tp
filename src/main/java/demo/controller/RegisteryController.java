@@ -26,16 +26,17 @@ public class RegisteryController {
 
     @GetMapping()
     public ResponseEntity<Object> getUsers() {
-        if(!System.getenv().get("APP_TYPE").equals("registery")){
+        if (!System.getenv().get("APP_TYPE").equals("registery")) {
             return null;
         }
         Stream<Worker> s = workersRepo.streamAllBy();
         return new ResponseEntity<>(s.toList(), HttpStatus.OK);
     }
+
     @Transactional
     @PostMapping("/manifest")
     public ResponseEntity<String> manifest(@RequestBody Worker worker) {
-        if(!System.getenv().get("APP_TYPE").equals("registery")){
+        if (!System.getenv().get("APP_TYPE").equals("registery")) {
             return null;
         }
         System.out.println("Manifestation reçue de '" + worker.getHostname() + "'.");
@@ -52,10 +53,11 @@ public class RegisteryController {
         sendWorkersList();
         return new ResponseEntity<>("Manifestation reçue", HttpStatus.OK);
     }
+
     @Transactional
     @Scheduled(fixedRate = 120000)
-    public void sendWorkersList(){
-        if(!System.getenv().get("APP_TYPE").equals("registery")){
+    public void sendWorkersList() {
+        if (!System.getenv().get("APP_TYPE").equals("registery")) {
             return;
         }
         System.out.println("ICCIIIIII");
@@ -76,6 +78,7 @@ public class RegisteryController {
 
         System.out.println("JAI SEND LES WORKERS");
     }
+
     public void checkUnresponsiveWorkers(List<Worker> allWorkers) {
         for (Worker worker : allWorkers) {
             if (isUnresponsive(worker)) {
