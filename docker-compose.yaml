@@ -42,7 +42,41 @@ services:
           done;
           tail -f /dev/null
         "
+  worker1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: worker1
+    environment:
+      - APP_TYPE=worker
+      - HOSTNAME=worker1
+      - SERVICE=hello
+    networks:
+      - internal_network
 
+  worker2:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: worker2
+      environment:
+        - APP_TYPE=worker
+        - HOSTNAME=worker2
+        - SERVICE=hello
+      networks:
+        - internal_network
+
+  worker3:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: worker3
+      environment:
+        - APP_TYPE=worker
+        - HOSTNAME=worker3
+        - SERVICE=chat
+      networks:
+        - internal_network
   loadbalancer:
     build:
       context: .
