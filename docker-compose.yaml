@@ -1,7 +1,9 @@
 version: "3.8"
 services:
   registery:
-    image: gestiondeprojet-loginapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: registery
     environment:
       - APP_TYPE=registery
@@ -9,7 +11,9 @@ services:
       - internal_network
 
   worker1:
-    image: gestiondeprojet-loginapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: worker1
     environment:
       - APP_TYPE=worker
@@ -18,7 +22,9 @@ services:
       - internal_network
 
   worker2:
-    image: gestiondeprojet-loginapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: worker2
     environment:
       - APP_TYPE=worker
@@ -27,7 +33,9 @@ services:
       - internal_network
 
   worker3:
-    image: gestiondeprojet-loginapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: worker3
     environment:
       - APP_TYPE=worker
